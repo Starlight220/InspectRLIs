@@ -1,6 +1,6 @@
 package io.starlight.inspector
 
-import io.starlight.env.Output
+import com.github.starlight.actions.Output
 import java.util.*
 
 object Report {
@@ -23,10 +23,12 @@ object Report {
     }
 
     /** Report an RLI as up-to-date */
-    fun upToDate(url: String, lines: LineRange, loc: Location) = if (loc.file in upToDateFiles) Unit else {
-        val triple = Triple(url, lines, loc)
-        if (triple !in upToDate) upToDate.push(triple) else Unit
-    }
+    fun upToDate(url: String, lines: LineRange, loc: Location) =
+        if (loc.file in upToDateFiles) Unit
+        else {
+            val triple = Triple(url, lines, loc)
+            if (triple !in upToDate) upToDate.push(triple) else Unit
+        }
 
     /** Report an RLI as outdated and automatically fixed */
     fun outdated(rli: Rli, location: Location): Unit = outdated.push(location to rli)
@@ -57,29 +59,19 @@ object Report {
     |<details>
     |
     |```
-    |${upToDateFiles.sorted().joinToString("\n") { "ALL @ <$it>" }}
+    |${upToDateFiles.sorted().joinToString("\n") { "ALL @ <${it}>" }}
     |${upToDate.sortedWith(locationComparator{it.third}).joinToString("\n") { (url, lines, loc) -> "${url}#${lines} @ <${loc.file}:${loc.line}>" }}
     |```
     |
     |</details>
     |
     |### Outdated - Automatically Fixed
-    |
-    |<details>
-    |
-    |```
-    |${outdated.sortedWith(locationComparator { it.first }).joinToString("\n") { (location, rli) -> "${rli.url}#${rli.lines} @ <${location.file}:${location.line}>"}}
-    |```
-    |
-    |</details>
+    |${outdated.run { if (isNotEmpty()) sortedWith(locationComparator { it.first }).joinToString(prefix = "\n<details>\n\n```\n", separator = "\n", postfix = "\n```\n\n</details>\n") { (location, rli) -> "${rli.url}#${rli.lines} @ <${location.file}:${location.line}>"} else "None"}}
     |
     |### Invalid - Manual Intervention Needed
+    |${invalid.run { if (isNotEmpty()) sortedWith(locationComparator { it.first }).joinToString(prefix = "\n<details>\n\n", separator = "\n", postfix = "\n\n</details>\n"){ it.second } else "None"}}
     |
-    |<details>
-    |
-    |${invalid.sortedWith(locationComparator { it.first }).joinToString("\n"){ it.second }}
-    |
-    |</details>
+    |${Constants.ignoredFiles.run { if (isNotEmpty()) joinToString(prefix = "##### Ignored Files\n```\n", separator = "\n", postfix = "\n```\n") else ""}}
     |
   """.trimMargin()
 

@@ -15,7 +15,7 @@ fun main() {
                 - else, require manual attention (**invalid**)
      */
     Constants.root
-        .walkDir { extension == "rst" }
+        .walkDir { extension == "rst" && !isFileIgnored(this)}
         .map { it.findRlis() }
         .asSequence()
         .flatMap { seq -> seq.map { it.status } }

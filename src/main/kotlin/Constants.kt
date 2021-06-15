@@ -1,6 +1,8 @@
 package io.starlight.inspector
 
-import io.starlight.env.Input
+import com.github.starlight.actions.Environment
+import com.github.starlight.actions.Input
+import kotlinx.serialization.Serializable
 import java.io.File
 
 private const val reportFilePath = "report.md"
@@ -10,8 +12,13 @@ private const val newTmpFilePath = "new.tmp"
 private const val rliHeaderRegex = """\.\. (?:rli)|(?:remoteliteralinclude)::"""
 private const val rliLinesRegex = """\r?\n[ ]*:lines: (\d*-\d*)"""
 
+// for local testing ONLY
+private const val envFilePath = "inputs.inspect_rli.json"
+
 /** Constants Namespace */
 object Constants {
+    private val env: InspectorEnv = Environment(File(envFilePath).readText())
+
     // files
     val reportFile = File(reportFilePath)
     val oldTmpFile = File(oldTmpFilePath)
@@ -39,10 +46,12 @@ object Constants {
         r
     }
 
+    val ignoredFiles: Set<String> by env::ignoredFiles
+
     override fun toString(): String {
         return """
       $root
-      $reportFilePath     
+      $reportFilePath
       $rliHeaderRegex
       $baseUrl
       $versionScheme
@@ -51,3 +60,12 @@ object Constants {
         """.trimIndent()
     }
 }
+
+@Serializable
+internal data class InspectorEnv(
+    @JvmField val root: String,
+    @JvmField val versionScheme: String,
+    @JvmField val baseUrl: String,
+    @JvmField val latestVersion: String,
+    @JvmField val ignoredFiles: Set<String> = emptySet(),
+) : Environment

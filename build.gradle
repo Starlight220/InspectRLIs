@@ -1,17 +1,24 @@
 plugins {
     id 'application'
-    id 'org.jetbrains.kotlin.jvm' version '1.5.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.5.10'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.0'
     id "com.diffplug.spotless" version "5.12.5"
 }
 
+group = "com.github.Starlight220"
+
 application.mainClassName = 'io.starlight.inspector.MainKt'
 repositories {
+    mavenLocal()
     mavenCentral()
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1"
+    implementation "com.github.Starlight220:ActionsKtLib:0.1"
+
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
 }
 
 spotless {

@@ -4,6 +4,8 @@ import java.io.File
 import java.util.HashSet
 import java.util.stream.Stream
 
+fun File.normalized(root: File) = this.toRelativeString(root).replace('\\', '/')
+
 /** Represents a file that contains RLIs. */
 class RliFile(private val file: File) : Comparable<RliFile> {
     private var content: String = file.readText()
@@ -59,11 +61,15 @@ class RliFile(private val file: File) : Comparable<RliFile> {
         return loc to Rli(version, url, lines)
     }
 
-    override fun toString(): String = file.toRelativeString(Constants.root)
+    override fun toString(): String = name
     override operator fun compareTo(other: RliFile): Int = this.file.compareTo(other.file)
-    override fun equals(other: Any?): Boolean = if (other is RliFile) {
-        this.file == other.file
-    } else false
+    override fun equals(other: Any?): Boolean =
+        if (other is RliFile) {
+            this.file == other.file
+        } else false
+
+    val name: String
+        get() = file.normalized(Constants.root)
 }
 
 /**
@@ -74,3 +80,8 @@ class RliFile(private val file: File) : Comparable<RliFile> {
  */
 fun File.walkDir(predicate: File.() -> Boolean): Stream<RliFile> =
     walk().filterTo(HashSet(), predicate).parallelStream().map(::RliFile)
+
+fun isFileIgnored(file: File): Boolean =
+    Constants.ignoredFiles.firstOrNull { isSubpath(file, it) }?.let { true } ?: false
+
+fun isSubpath(file: File, str: String) = file.normalized(Constants.root).startsWith(str)
