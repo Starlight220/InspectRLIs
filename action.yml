@@ -9,14 +9,14 @@ inputs:
     required: true
     default: '$GITHUB_WORKSPACE'
   latestVersion:
-    description: 'Version of RLIs to enforce'
-    required: true
+    description: 'Version of RLIs to enforce. If not specified here, will be taken from the JSON file pointed to by INSPECTOR_CONFIG.'
+    required: false
   baseUrl:
-    description: 'Base URL of all RLIs'
-    required: true
+    description: 'Base URL of all RLIs. If not specified here, will be taken from the JSON file pointed to by INSPECTOR_CONFIG.'
+    required: false
   versionScheme:
-    description: 'A regex that all RLI versions match'
-    required: true
+    description: 'A regex that all RLI versions match. If not specified here, will be taken from the JSON file pointed to by INSPECTOR_CONFIG.'
+    required: false
 outputs:
   report:
     description: 'Full Report; written to the `report.md` file, console, and this output.'

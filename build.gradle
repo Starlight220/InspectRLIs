@@ -28,10 +28,19 @@ spotless {
     }
 }
 
+boolean isCI() {
+    return (project.hasProperty("CI") && project.property("CI") == true)
+}
+
+run.doFirst {
+    if (isCI()) return
+
+    environment 'INSPECTOR_CONFIG', 'inputs.inspector.json'
+}
+
 task cleanup(type: Delete) {
-    if (project.hasProperty("CI") && project.property("CI") == true) {
-        return
-    }
+    if (isCI()) return
+
     delete 'outputs.inspect_rli.json'
     delete 'report.md'
     delete 'new.tmp'

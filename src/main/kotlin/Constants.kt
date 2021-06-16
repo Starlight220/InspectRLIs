@@ -12,12 +12,9 @@ private const val newTmpFilePath = "new.tmp"
 private const val rliHeaderRegex = """\.\. (?:rli)|(?:remoteliteralinclude)::"""
 private const val rliLinesRegex = """\r?\n[ ]*:lines: (\d*-\d*)"""
 
-// for local testing ONLY
-private const val envFilePath = "inputs.inspect_rli.json"
-
 /** Constants Namespace */
 object Constants {
-    private val env: InspectorEnv = Environment(File(envFilePath).readText())
+    private val env: InspectorEnv = Environment(File(System.getenv("GITHUB_WORKSPACE").takeUnless { it.isNullOrEmpty() }, System.getenv("INSPECTOR_CONFIG")).readText())
 
     // files
     val reportFile = File(reportFilePath)
