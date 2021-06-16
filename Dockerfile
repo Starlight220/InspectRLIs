@@ -1,7 +1,7 @@
 FROM wpilib/ubuntu-base:18.04
 
-COPY . /inspect_rli/
-RUN chmod +x /inspect_rli/run.sh
-RUN chmod +x /inspect_rli/gradlew
+COPY . /inspector/
+RUN chmod +x /inspector/run.sh
+RUN chmod +x /inspector/gradlew
 
 ENTRYPOINT ["/inspector/run.sh"]
