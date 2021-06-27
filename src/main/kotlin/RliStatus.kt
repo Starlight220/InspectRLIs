@@ -1,12 +1,14 @@
 package io.starlight.inspector
 
+import io.starlight.inspector.agents.Agent
+
 sealed class RliStatus(val rli: Rli, val location: Location) {
     constructor(base: LocatedRli) : this(base.second, base.first)
 
     class Valid(base: LocatedRli) : RliStatus(base) {
         override fun invoke() {
             Report.outdated(rli, location)
-            location.file.replaceRange(location.indexRange, Constants.latestVersion)
+            location.file.replaceRange(location.indexRange, Agent.getCurrent().latestVersion)
         }
     }
 

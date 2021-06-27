@@ -1,9 +1,11 @@
 package io.starlight.inspector
 
 import com.github.starlight.actions.Output
+import io.starlight.inspector.agents.Agent
 import java.util.*
 
 object Report {
+    private val agent = Agent.getCurrent()
     private val upToDateFiles = LinkedList<RliFile>()
     private val upToDate = LinkedList<Triple<String, LineRange, Location>>()
     private val outdated = LinkedList<LocatedRli>()
@@ -39,7 +41,7 @@ object Report {
             invalid.push(
                 location to
                     """
-                |> [${Constants.latestVersion} |](${diff.old.withLatest.fullUrl}) [${diff.old.version}/${diff.old.url}#${diff.old.lines}](${diff.old.fullUrl}) @ <${location.file}:${location.line}>
+                |> [${agent.latestVersion} |](${diff.old.copy(version = agent.latestVersion).fullUrl}) [${diff.old.version}/${diff.old.url}#${diff.old.lines}](${diff.old.fullUrl}) @ <${location.file}:${location.line}>
                 |```diff
                 |${buildDiffBlock(diff)}
                 |```
@@ -71,7 +73,7 @@ object Report {
     |### Invalid - Manual Intervention Needed
     |${invalid.run { if (isNotEmpty()) sortedWith(locationComparator { it.first }).joinToString(prefix = "\n<details>\n\n", separator = "\n", postfix = "\n\n</details>\n"){ it.second } else "None"}}
     |
-    |${Constants.ignoredFiles.run { if (isNotEmpty()) joinToString(prefix = "##### Ignored Files\n```\n", separator = "\n", postfix = "\n```\n") else ""}}
+    |${agent.ignoredFiles.run { if (isNotEmpty()) joinToString(prefix = "##### Ignored Files\n```\n", separator = "\n", postfix = "\n```\n") else ""}}
     |
   """.trimMargin()
 
@@ -83,9 +85,9 @@ object Report {
         val _needsManual = invalid.isNotEmpty()
         needsManual = _needsManual
         isUpToDate = !_needsManual && outdated.isEmpty()
-        reportFilePath = Constants.reportFile.canonicalPath
+        reportFilePath = agent.reportFile.canonicalPath
         report = toString()
-        Constants.reportFile.writeText(report)
+        agent.reportFile.writeText(report)
         println(report)
     }
 }
